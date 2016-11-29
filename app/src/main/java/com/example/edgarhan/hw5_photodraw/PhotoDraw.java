@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.FileOutputStream;
@@ -105,19 +106,19 @@ public class PhotoDraw extends AppCompatActivity {
         // add a sticker to the bitmap
     }
 
-    public void clickRed() {
+    public void clickRed(View v) {
         paintColor = 0xFF000000;
         drawPaint.setColor(paintColor);
         toastMe("Clicked Red");
     }
 
-    public void clickBlue() {
+    public void clickBlue(View v) {
         paintColor = 0x0000FF00;
         drawPaint.setColor(paintColor);
         toastMe("Clicked Blue");
     }
 
-    public void clickGreen() {
+    public void clickGreen(View v) {
         paintColor = 0x00FF0000;
         drawPaint.setColor(paintColor);
         toastMe("Clicked Green");
@@ -126,7 +127,7 @@ public class PhotoDraw extends AppCompatActivity {
     /**
      * save to file
      */
-    public void clickDone() {
+    public void clickDone(View v) {
         toastMe("Clicked Done");
         FileOutputStream out = null;
         try {
@@ -152,11 +153,11 @@ public class PhotoDraw extends AppCompatActivity {
         toast.show();
     }
 
-    public void clickUndo() {
+    public void clickUndo(View v) {
         toastMe("Clicked Undo");
     }
 
-    public void clickClear() {
+    public void clickClear(View v) {
         toastMe("Clicked Clear");
     }
 }
