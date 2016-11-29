@@ -68,7 +68,7 @@ public class PhotoDraw extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
-            canvas = new Canvas(bitmap);
+            //canvas = new Canvas(bitmap);
             //bitmap = (Bitmap)extras.get("data");
             //BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
             //myCanvas.setBitmap(bitmap);
