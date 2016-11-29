@@ -13,8 +13,7 @@
     <com.example.edgarhan.hw5_photodraw.MyCanvas
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/myCanvas">
-    </com.example.edgarhan.hw5_photodraw.MyCanvas>
+        android:id="@+id/myCanvas" />
 
     <GridLayout
         android:layout_width="wrap_content"

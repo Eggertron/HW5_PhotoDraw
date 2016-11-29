@@ -1,20 +1,15 @@
 package com.example.edgarhan.hw5_photodraw;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.HashMap;
 
-import static android.R.attr.angle;
-import static android.R.attr.left;
-import static com.example.edgarhan.hw5_photodraw.R.id.top;
 
 /**
  * Created by eggertron on 11/28/16.
@@ -23,8 +18,6 @@ import static com.example.edgarhan.hw5_photodraw.R.id.top;
 public class MyCanvas extends View {
     HashMap<Integer, Path> activePaths;
     Paint pathPaint;
-    Bitmap bitmap;
-    MyCanvas myCanvas;
 
     public MyCanvas(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -33,7 +26,6 @@ public class MyCanvas extends View {
         pathPaint.setColor(Color.BLACK);
         pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeWidth(70);
-        myCanvas = (MyCanvas)findViewById(R.id.myCanvas);
 
     }
 

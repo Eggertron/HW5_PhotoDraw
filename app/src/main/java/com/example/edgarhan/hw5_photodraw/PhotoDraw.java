@@ -23,7 +23,6 @@ public class PhotoDraw extends AppCompatActivity {
     MyCanvas myCanvas;
     TouchHandler touchHandler;
     Bitmap bitmap;
-    Canvas canvas;
 
     //initial color
     private int paintColor = 0xFF660000;
@@ -40,9 +39,8 @@ public class PhotoDraw extends AppCompatActivity {
         if (message.equals("START")) {
             takePicture();
         }
-
-        touchHandler = new TouchHandler(this);
         myCanvas = (MyCanvas) findViewById(R.id.myCanvas);
+        touchHandler = new TouchHandler(this);
         myCanvas.setOnTouchListener(touchHandler);
     }
 
@@ -59,19 +57,11 @@ public class PhotoDraw extends AppCompatActivity {
         }
     }
 
-    protected void onDraw() {
-        //draw view
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
-            //canvas = new Canvas(bitmap);
-            //bitmap = (Bitmap)extras.get("data");
-            //BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
-            //myCanvas.setBitmap(bitmap);
             myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
         }
     }
@@ -125,9 +115,12 @@ public class PhotoDraw extends AppCompatActivity {
         toastMe("Clicked Done");
         FileOutputStream out = null;
         try {
-            String filename = new SimpleDateFormat("HHmmss").toString();
+            //String filename = new SimpleDateFormat("HHmmss").toString();
+            String filename = "test.png";
             out = new FileOutputStream(filename);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            Bitmap bm = v.getDrawingCache();
+            //bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            bm.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
         } catch (Exception e) {
             e.printStackTrace();
