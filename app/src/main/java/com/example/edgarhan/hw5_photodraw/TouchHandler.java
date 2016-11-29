@@ -15,20 +15,15 @@ import android.view.View;
 public class TouchHandler implements View.OnTouchListener {
     MainActivity mainActivity;
     PhotoDraw photoDraw;
-    Path drawPath;
-    Paint drawPaint;
-    Canvas canvas;
 
     GestureDetectorCompat gestureDetectorCompat;
 
     //public TouchHandler(MainActivity mainActivity) {
-    public TouchHandler(PhotoDraw pd, Canvas c, Path p, Paint dp) {
+    public TouchHandler(PhotoDraw pd) {
         //this.mainActivity = mainActivity;
         photoDraw = pd;
-        drawPath = p;
-        canvas = c;
-        drawPaint = dp;
-        gestureDetectorCompat = new GestureDetectorCompat(this.mainActivity, new MyGestureListener());
+        //gestureDetectorCompat = new GestureDetectorCompat(this.mainActivity, new MyGestureListener());
+        gestureDetectorCompat = new GestureDetectorCompat(this.photoDraw, new MyGestureListener());
     }
 
     @Override
@@ -39,19 +34,31 @@ public class TouchHandler implements View.OnTouchListener {
         gestureDetectorCompat.onTouchEvent(event);
         switch (maskedAction) {
             case MotionEvent.ACTION_DOWN:
-                drawPath.moveTo(touchX, touchY);
+                //drawPath.moveTo(touchX, touchY);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
+                for (int i = 0, size = event.getPointerCount(); i < size; i++) {
+                    int id = event.getPointerId(i);
+                    photoDraw.addNewPath(id, event.getX(i), event.getY(i));
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
-                drawPath.lineTo(touchX, touchY);
+                //drawPath.lineTo(touchX, touchY);
+                for (int i = 0, size = event.getPointerCount(); i < size; i++) {
+                    int id = event.getPointerId(i);
+                    photoDraw.updatePath(id, event.getX(i), event.getY(i));
+                }
                 break;
             case MotionEvent.ACTION_UP:
-                canvas.drawPath(drawPath, drawPaint);
-                drawPath.reset();
+                //canvas.drawPath(drawPath, drawPaint);
+                //drawPath.reset();
                 break;
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL:
+                for (int i = 0, size = event.getPointerCount(); i < size; i++) {
+                    int id = event.getPointerId(i);
+                    photoDraw.removePath(id);
+                }
                 break;
         }
         photoDraw.onDraw();

@@ -5,13 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
     Button startBtn;
+    static String msg = EXTRA_MESSAGE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +28,8 @@ public class MainActivity extends AppCompatActivity {
     public void clickStart(View view) {
         // open camera, get image and send to intent
         Intent intent = new Intent(this, PhotoDraw.class);
-        //EditText editText = (EditText) findViewById(R.id.edit_message);
-        //String message = editText.getText().toString();
-        //intent.putExtra(EXTRA_MESSAGE, message);
+        String message = "START";
+        intent.putExtra(msg, message);
         startActivity(intent);
     }
 }

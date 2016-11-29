@@ -23,7 +23,6 @@ import static com.example.edgarhan.hw5_photodraw.R.id.top;
 public class MyCanvas extends View {
     HashMap<Integer, Path> activePaths;
     Paint pathPaint;
-    BitmapDrawable bitmapDrawable;
     Bitmap bitmap;
     MyCanvas myCanvas;
 
@@ -36,6 +35,10 @@ public class MyCanvas extends View {
         pathPaint.setStrokeWidth(70);
         myCanvas = (MyCanvas)findViewById(R.id.myCanvas);
 
+    }
+
+    public void setColor(int i) {
+        pathPaint.setColor(i);
     }
 
     public void addPath(int id, float x, float y) {
@@ -60,10 +63,6 @@ public class MyCanvas extends View {
         invalidate();
     }
 
-    public void upSideDown() {
-        myCanvas.setRotationY(90);
-        invalidate();
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -71,22 +70,5 @@ public class MyCanvas extends View {
         for (Path path : activePaths.values()) {
             canvas.drawPath(path, pathPaint);
         }
-        canvas.save(Canvas.MATRIX_SAVE_FLAG); //Saving the canvas and later restoring it so only this image will be rotated.
-        canvas.rotate(-angle);
-        //canvas.drawBitmap(bitmap, left, top, null);
-        canvas.restore();
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    public void rightSideUp(Canvas canvas) {
-        canvas.save(Canvas.MATRIX_SAVE_FLAG); //Saving the canvas and later restoring it so only this image will be rotated.
-        canvas.rotate(-angle * 2);
-        canvas.drawBitmap(bitmap, left, top, null);
-        canvas.restore();
-
-        invalidate();
     }
 }

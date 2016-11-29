@@ -1,9 +1,9 @@
 package com.example.edgarhan.hw5_photodraw;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
@@ -15,10 +15,8 @@ import android.widget.Toast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Random;
 
 public class PhotoDraw extends AppCompatActivity {
 
@@ -26,10 +24,7 @@ public class PhotoDraw extends AppCompatActivity {
     TouchHandler touchHandler;
     Bitmap bitmap;
     Canvas canvas;
-    //drawing path
-    private Path drawPath;
-    //drawing and canvas paint
-    private Paint drawPaint, canvasPaint;
+
     //initial color
     private int paintColor = 0xFF660000;
 
@@ -40,26 +35,22 @@ public class PhotoDraw extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_draw);
 
-        /*
         Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
-        TextView textView = new TextView(this);
-        textView.setTextSize(40);
-        textView.setText(message);
-        */
+        String message = intent.getStringExtra(MainActivity.msg);
+        if (message.equals("START")) {
+            takePicture();
+        }
 
-        takePicture();
-        drawPath = new Path();
-        drawPaint = new Paint();
-        drawPaint.setColor(paintColor);
-        drawPaint.setAntiAlias(true);
-        drawPaint.setStrokeWidth(20);
-        drawPaint.setStyle(Paint.Style.STROKE);
-        drawPaint.setStrokeJoin(Paint.Join.ROUND);
-        drawPaint.setStrokeCap(Paint.Cap.ROUND);
-        canvasPaint = new Paint(Paint.DITHER_FLAG);
-        touchHandler = new TouchHandler(this, canvas, drawPath, drawPaint);
+        touchHandler = new TouchHandler(this);
+        myCanvas = (MyCanvas) findViewById(R.id.myCanvas);
+        myCanvas.setOnTouchListener(touchHandler);
     }
+
+    public void addNewPath(int id, float x, float y) {     myCanvas.addPath(id, x, y); }
+
+    public void updatePath(int id, float x, float y) {     myCanvas.updatePath(id, x, y); }
+
+    public void removePath(int id) {     myCanvas.removePath(id); }
 
     private void takePicture() {
         Intent takePic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -70,8 +61,6 @@ public class PhotoDraw extends AppCompatActivity {
 
     protected void onDraw() {
         //draw view
-        canvas.drawBitmap(bitmap, 0, 0, canvasPaint);
-        canvas.drawPath(drawPath, drawPaint);
     }
 
     @Override
@@ -82,9 +71,8 @@ public class PhotoDraw extends AppCompatActivity {
             canvas = new Canvas(bitmap);
             //bitmap = (Bitmap)extras.get("data");
             //BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
-            myCanvas.setBitmap(bitmap);
-            //myCanvas.setBackground(bitmapDrawable);
-
+            //myCanvas.setBitmap(bitmap);
+            myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
         }
     }
 
@@ -104,23 +92,25 @@ public class PhotoDraw extends AppCompatActivity {
      */
     public void onDoubleTap(float x, float y) {
         // add a sticker to the bitmap
+        Random rd = new Random();
+        myCanvas.setBackgroundColor(Color.rgb(rd.nextInt(255), rd.nextInt(255), rd.nextInt(255)));
     }
 
     public void clickRed(View v) {
         paintColor = 0xFF000000;
-        drawPaint.setColor(paintColor);
+        myCanvas.setColor(paintColor);
         toastMe("Clicked Red");
     }
 
     public void clickBlue(View v) {
         paintColor = 0x0000FF00;
-        drawPaint.setColor(paintColor);
+        myCanvas.setColor(paintColor);
         toastMe("Clicked Blue");
     }
 
     public void clickGreen(View v) {
         paintColor = 0x00FF0000;
-        drawPaint.setColor(paintColor);
+        myCanvas.setColor(paintColor);
         toastMe("Clicked Green");
     }
 
