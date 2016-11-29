@@ -23,6 +23,7 @@ public class PhotoDraw extends AppCompatActivity {
     MyCanvas myCanvas;
     TouchHandler touchHandler;
     Bitmap bitmap;
+    float lastX, lastY;
 
     //initial color
     private int paintColor = 0xFF660000;
@@ -48,7 +49,7 @@ public class PhotoDraw extends AppCompatActivity {
 
     public void updatePath(int id, float x, float y) {     myCanvas.updatePath(id, x, y); }
 
-    public void removePath(int id) {     myCanvas.removePath(id); }
+    public void removePath(int id) {     myCanvas.removePath(); }
 
     private void takePicture() {
         Intent takePic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -74,8 +75,10 @@ public class PhotoDraw extends AppCompatActivity {
     public void onLongPress(float x, float y) {
         toastMe("Long Press: " + x + ": " + y);
         // add a sticker to the bitmap
-        Random rd = new Random();
-        myCanvas.setBackgroundColor(Color.rgb(rd.nextInt(255), rd.nextInt(255), rd.nextInt(255)));
+        myCanvas.star = true;
+        myCanvas.lastX = x;
+        myCanvas.lastY = y;
+        myCanvas.invalidate();
     }
 
     /**
@@ -91,20 +94,20 @@ public class PhotoDraw extends AppCompatActivity {
     }
 
     public void clickRed(View v) {
-        paintColor = 0xFF000000;
-        myCanvas.setColor(paintColor);
+        paintColor = Color.RED;
+        myCanvas.setColor(0);
         toastMe("Clicked Red");
     }
 
     public void clickBlue(View v) {
-        paintColor = 0x0000FF00;
-        myCanvas.setColor(paintColor);
+        paintColor = Color.BLUE;
+        myCanvas.setColor(1);
         toastMe("Clicked Blue");
     }
 
     public void clickGreen(View v) {
-        paintColor = 0x00FF0000;
-        myCanvas.setColor(paintColor);
+        paintColor = Color.GREEN;
+        myCanvas.setColor(2);
         toastMe("Clicked Green");
     }
 
@@ -142,11 +145,11 @@ public class PhotoDraw extends AppCompatActivity {
 
     public void clickUndo(View v) {
         toastMe("Clicked Undo");
-        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
+        myCanvas.removePath();
     }
 
     public void clickClear(View v) {
         toastMe("Clicked Clear");
-        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
+        myCanvas.clearPath();
     }
 }

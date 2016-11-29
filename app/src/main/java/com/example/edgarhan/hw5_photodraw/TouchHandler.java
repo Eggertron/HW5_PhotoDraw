@@ -28,7 +28,6 @@ public class TouchHandler implements View.OnTouchListener {
         int maskedAction = event.getActionMasked();
         switch (maskedAction) {
             case MotionEvent.ACTION_DOWN:
-                break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 createPath(event);
                 break;
@@ -36,11 +35,9 @@ public class TouchHandler implements View.OnTouchListener {
                 updatePath(event);
                 break;
             case MotionEvent.ACTION_UP:
-                break;
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL:
-                removePath(event);
-                break;
+                //removePath(event);
         }
         //photoDraw.onDraw();
         return true;
