@@ -82,7 +82,10 @@ public class PhotoDraw extends AppCompatActivity {
      * @param y coordinate
      */
     public void onLongPress(float x, float y) {
+        toastMe("Long Press: " + x + ": " + y);
         // add a sticker to the bitmap
+        Random rd = new Random();
+        myCanvas.setBackgroundColor(Color.rgb(rd.nextInt(255), rd.nextInt(255), rd.nextInt(255)));
     }
 
     /**
@@ -91,6 +94,7 @@ public class PhotoDraw extends AppCompatActivity {
      * @param y coordinate
      */
     public void onDoubleTap(float x, float y) {
+        toastMe("Double Tap: " + x + ": " + y);
         // add a sticker to the bitmap
         Random rd = new Random();
         myCanvas.setBackgroundColor(Color.rgb(rd.nextInt(255), rd.nextInt(255), rd.nextInt(255)));
@@ -121,7 +125,7 @@ public class PhotoDraw extends AppCompatActivity {
         toastMe("Clicked Done");
         FileOutputStream out = null;
         try {
-            String filename = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").toString();
+            String filename = new SimpleDateFormat("HHmmss").toString();
             out = new FileOutputStream(filename);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
@@ -145,9 +149,11 @@ public class PhotoDraw extends AppCompatActivity {
 
     public void clickUndo(View v) {
         toastMe("Clicked Undo");
+        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
     }
 
     public void clickClear(View v) {
         toastMe("Clicked Clear");
+        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
     }
 }
