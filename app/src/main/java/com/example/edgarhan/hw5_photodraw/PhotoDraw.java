@@ -1,5 +1,6 @@
 package com.example.edgarhan.hw5_photodraw;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +10,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 public class PhotoDraw extends AppCompatActivity {
 
@@ -39,7 +48,6 @@ public class PhotoDraw extends AppCompatActivity {
         */
 
         takePicture();
-        touchHandler = new TouchHandler(this, canvas, drawPath, drawPaint);
         drawPath = new Path();
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
@@ -49,6 +57,7 @@ public class PhotoDraw extends AppCompatActivity {
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
         canvasPaint = new Paint(Paint.DITHER_FLAG);
+        touchHandler = new TouchHandler(this, canvas, drawPath, drawPaint);
     }
 
     private void takePicture() {
@@ -99,15 +108,55 @@ public class PhotoDraw extends AppCompatActivity {
     public void clickRed() {
         paintColor = 0xFF000000;
         drawPaint.setColor(paintColor);
+        toastMe("Clicked Red");
     }
 
     public void clickBlue() {
         paintColor = 0x0000FF00;
         drawPaint.setColor(paintColor);
+        toastMe("Clicked Blue");
     }
 
     public void clickGreen() {
         paintColor = 0x00FF0000;
         drawPaint.setColor(paintColor);
+        toastMe("Clicked Green");
+    }
+
+    /**
+     * save to file
+     */
+    public void clickDone() {
+        toastMe("Clicked Done");
+        FileOutputStream out = null;
+        try {
+            String filename = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").toString();
+            out = new FileOutputStream(filename);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void toastMe(String msg) {
+        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    public void clickUndo() {
+        toastMe("Clicked Undo");
+    }
+
+    public void clickClear() {
+        toastMe("Clicked Clear");
     }
 }

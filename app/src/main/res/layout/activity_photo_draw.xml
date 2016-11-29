@@ -27,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="RED"
+            android:onClick="clickRed"
             android:background="@android:color/holo_red_dark"
             android:id="@+id/redBtn"/>
         <Space
@@ -35,6 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BLUE"
+            android:onClick="clickBlue"
             android:id="@+id/blueBtn"
             android:background="@android:color/holo_blue_dark"/>
         <Space
@@ -43,12 +45,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="GREEN"
+            android:onClick="clickGreen"
             android:id="@+id/greenBtn"
             android:background="@android:color/holo_green_dark"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Undo"
+            android:onClick="clickUndo"
             android:id="@+id/undoBtn"/>
         <Space
             android:layout_width="10dp"/>
@@ -56,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Clear"
+            android:onClick="clickClear"
             android:id="@+id/clearBtn"/>
         <Space
             android:layout_width="10dp"/>
@@ -63,6 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Done"
+            android:onClick="clickDone"
             android:id="@+id/doneBtn"/>
     </GridLayout>
 </RelativeLayout>
