@@ -73,12 +73,9 @@ public class PhotoDraw extends AppCompatActivity {
      * @param y coordinate
      */
     public void onLongPress(float x, float y) {
-        toastMe("Long Press: " + x + ": " + y);
+        //toastMe("Long Press: " + x + ": " + y);
         // add a sticker to the bitmap
-        myCanvas.star = true;
-        myCanvas.lastX = x;
-        myCanvas.lastY = y;
-        myCanvas.invalidate();
+        myCanvas.addStar((int)x, (int)y);
     }
 
     /**
@@ -87,10 +84,9 @@ public class PhotoDraw extends AppCompatActivity {
      * @param y coordinate
      */
     public void onDoubleTap(float x, float y) {
-        toastMe("Double Tap: " + x + ": " + y);
+        //toastMe("Double Tap: " + x + ": " + y);
         // add a sticker to the bitmap
-        Random rd = new Random();
-        myCanvas.setBackgroundColor(Color.rgb(rd.nextInt(255), rd.nextInt(255), rd.nextInt(255)));
+        myCanvas.addVT((int)x, (int)y);
     }
 
     public void clickRed(View v) {
@@ -116,6 +112,8 @@ public class PhotoDraw extends AppCompatActivity {
      */
     public void clickDone(View v) {
         toastMe("Clicked Done");
+        super.onBackPressed();
+        /*
         FileOutputStream out = null;
         try {
             //String filename = new SimpleDateFormat("HHmmss").toString();
@@ -136,6 +134,7 @@ public class PhotoDraw extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+        */
     }
 
     public void toastMe(String msg) {

@@ -1,12 +1,14 @@
 package com.example.edgarhan.hw5_photodraw;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -14,6 +16,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+
+import static android.R.attr.left;
+import static android.R.attr.right;
+import static com.example.edgarhan.hw5_photodraw.R.id.bottom;
+import static com.example.edgarhan.hw5_photodraw.R.id.top;
 
 
 /**
@@ -24,17 +31,21 @@ public class MyCanvas extends View {
     //HashMap<Integer, Path> activePaths;
     HashMap<Integer, Brush> activePaths;
     List<HashMap<Integer, Brush>> listPaths;
+    List<Drawable> listStamps;
     //Paint redPaint, bluePaint, greenPaint;
     //Path path;
     Brush brush;
     int paintColor;
     boolean star;
     float lastX, lastY;
+    Context mContext;
 
     public MyCanvas(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         activePaths = new HashMap<>();
         listPaths = new LinkedList<>();
+        listStamps = new LinkedList<>();
         paintColor = 0;
         brush = new Brush();
         star = false;
@@ -81,19 +92,30 @@ public class MyCanvas extends View {
                 canvas.drawPath(brush.path, brush.pathPaint);
             }
         }
-        addStar(canvas);
+        for (Drawable myImage : listStamps) {
+            myImage.draw(canvas);
+        }
     }
 
-    private void addStar(Canvas canvas) {
-        if (star) {
-            Bitmap b= BitmapFactory.decodeResource(getResources(), R.drawable.star);
-            canvas.drawBitmap(b, lastX, lastY, null);
-            star = false;
-        }
+    public void addStar(int x, int y) {
+        Resources res = mContext.getResources();
+        Drawable myImage = res.getDrawable(R.drawable.star);
+        myImage.setBounds(x, y, x + 100, y + 100);
+        listStamps.add(myImage);
+        invalidate();
     }
 
     public void clearPath() {
         listPaths.clear();
+        listStamps.clear();
+        invalidate();
+    }
+
+    public void addVT(int x, int y) {
+        Resources res = mContext.getResources();
+        Drawable myImage = res.getDrawable(R.drawable.vt);
+        myImage.setBounds(x, y, x + 100, y + 100);
+        listStamps.add(myImage);
         invalidate();
     }
 
