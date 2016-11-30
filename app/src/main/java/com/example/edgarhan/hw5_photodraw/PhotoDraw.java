@@ -2,16 +2,19 @@ package com.example.edgarhan.hw5_photodraw;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.MediaController;
 import android.widget.Toast;
 
 import java.io.FileOutputStream;
@@ -24,7 +27,10 @@ public class PhotoDraw extends AppCompatActivity {
     MyCanvas myCanvas;
     TouchHandler touchHandler;
     Bitmap bitmap;
-    float lastX, lastY;
+    final String tmpImageStore = Environment.getExternalStorageDirectory()
+            .toString() + "/imageStore.jpg";
+
+    MediaPlayer mp;
 
     //initial color
     private int paintColor = 0xFF660000;
@@ -44,6 +50,12 @@ public class PhotoDraw extends AppCompatActivity {
         myCanvas = (MyCanvas) findViewById(R.id.myCanvas);
         touchHandler = new TouchHandler(this);
         myCanvas.setOnTouchListener(touchHandler);
+
+        // load from file.
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(tmpImageStore, options);
+        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
     }
 
     public void addNewPath(int id, float x, float y) {     myCanvas.addPath(id, x, y); }
@@ -54,6 +66,7 @@ public class PhotoDraw extends AppCompatActivity {
 
     private void takePicture() {
         Intent takePic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePic.putExtra(MediaStore.EXTRA_OUTPUT, tmpImageStore); // save to file.
         if(takePic.resolveActivity(getPackageManager())!=null) {
             startActivityForResult(takePic, REQUEST_IMAGE_CAPTURE);
         }
@@ -156,5 +169,15 @@ public class PhotoDraw extends AppCompatActivity {
     public void clickClear(View v) {
         toastMe("Clicked Clear");
         myCanvas.clearPath();
+    }
+
+    public void startSound() {
+        mp = MediaPlayer.create(this, R.raw.pencil);
+        mp.start();
+    }
+
+    public void stopSound() {
+        mp.stop();
+        mp = null;
     }
 }

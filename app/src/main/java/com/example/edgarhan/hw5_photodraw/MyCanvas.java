@@ -58,7 +58,9 @@ public class MyCanvas extends View {
     }
 
     public void addPath(int id, float x, float y) {
-        activePaths = new HashMap<>();
+        if (id == 0) {
+            activePaths = new HashMap<>();
+        }
         brush = new Brush();
         brush.path.moveTo(x, y);
         if (paintColor == 0) brush.setRed();
@@ -66,10 +68,12 @@ public class MyCanvas extends View {
         else if (paintColor == 2) brush.setGreen();
         activePaths.put(id, brush);
         //listPaths.add(activePaths);
-        Draws draw = new Draws();
-        draw.type = 0;
-        draw.activePaths = activePaths;
-        listDraws.add(draw);
+        if (id == 0) {
+            Draws draw = new Draws();
+            draw.type = 0;
+            draw.activePaths = activePaths;
+            listDraws.add(draw);
+        }
         invalidate();
     }
 

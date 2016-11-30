@@ -3,6 +3,7 @@ package com.example.edgarhan.hw5_photodraw;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.media.MediaPlayer;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -13,6 +14,7 @@ import android.view.View;
  */
 
 public class TouchHandler implements View.OnTouchListener {
+
     PhotoDraw photoDraw;
 
     GestureDetectorCompat gestureDetectorCompat;
@@ -29,6 +31,7 @@ public class TouchHandler implements View.OnTouchListener {
         switch (maskedAction) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
+                photoDraw.startSound();
                 createPath(event);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -36,6 +39,7 @@ public class TouchHandler implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_UP:
+                photoDraw.stopSound();
             case MotionEvent.ACTION_CANCEL:
                 //removePath(event);
         }
