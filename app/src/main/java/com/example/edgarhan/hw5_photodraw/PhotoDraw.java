@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -111,15 +112,19 @@ public class PhotoDraw extends AppCompatActivity {
      * save to file
      */
     public void clickDone(View v) {
-        toastMe("Clicked Done");
-        super.onBackPressed();
-        /*
+        toastMe("Saved to photo gallery!");
+
         FileOutputStream out = null;
         try {
             //String filename = new SimpleDateFormat("HHmmss").toString();
-            String filename = "test.png";
+            String filename = Environment.getExternalStorageDirectory()
+                    .toString() + "/DCIM/Camera/PicDraw" +
+                    new SimpleDateFormat("HHmmss").toString() +
+                    ".png";
             out = new FileOutputStream(filename);
-            Bitmap bm = v.getDrawingCache();
+            myCanvas.setDrawingCacheEnabled(true);
+            myCanvas.buildDrawingCache();
+            Bitmap bm = myCanvas.getDrawingCache();
             //bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             bm.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
@@ -134,7 +139,8 @@ public class PhotoDraw extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        */
+
+        super.onBackPressed();
     }
 
     public void toastMe(String msg) {
