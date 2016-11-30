@@ -32,6 +32,7 @@ public class MyCanvas extends View {
     HashMap<Integer, Brush> activePaths;
     List<HashMap<Integer, Brush>> listPaths;
     List<Drawable> listStamps;
+    List<Draws> listDraws;
     //Paint redPaint, bluePaint, greenPaint;
     //Path path;
     Brush brush;
@@ -46,6 +47,7 @@ public class MyCanvas extends View {
         activePaths = new HashMap<>();
         listPaths = new LinkedList<>();
         listStamps = new LinkedList<>();
+        listDraws = new LinkedList<>();
         paintColor = 0;
         brush = new Brush();
         star = false;
@@ -63,7 +65,11 @@ public class MyCanvas extends View {
         else if (paintColor == 1) brush.setBlue();
         else if (paintColor == 2) brush.setGreen();
         activePaths.put(id, brush);
-        listPaths.add(activePaths);
+        //listPaths.add(activePaths);
+        Draws draw = new Draws();
+        draw.type = 0;
+        draw.activePaths = activePaths;
+        listDraws.add(draw);
         invalidate();
     }
 
@@ -79,7 +85,10 @@ public class MyCanvas extends View {
         if (!listPaths.isEmpty()) {
             listPaths.remove(listPaths.size() - 1);
         }
-        System.out.println("list size: " + listPaths.size());
+        if (!listDraws.isEmpty()) {
+            listDraws.remove(listDraws.size() - 1);
+        }
+        System.out.println("list size: " + listDraws.size());
         invalidate();
     }
 
@@ -87,6 +96,7 @@ public class MyCanvas extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        /*
         for (HashMap<Integer, Brush> activePaths : listPaths) {
             for (Brush brush : activePaths.values()) {
                 canvas.drawPath(brush.path, brush.pathPaint);
@@ -95,28 +105,57 @@ public class MyCanvas extends View {
         for (Drawable myImage : listStamps) {
             myImage.draw(canvas);
         }
+        */
+        for (Draws draws : listDraws) {
+            if (draws.type == 0) {
+                for (Brush brush : draws.activePaths.values()) {
+                    canvas.drawPath(brush.path, brush.pathPaint);
+                }
+            }
+            else {
+                draws.drawable.draw(canvas);
+            }
+        }
     }
 
     public void addStar(int x, int y) {
         Resources res = mContext.getResources();
         Drawable myImage = res.getDrawable(R.drawable.star);
         myImage.setBounds(x, y, x + 100, y + 100);
-        listStamps.add(myImage);
+        //listStamps.add(myImage);
+        Draws draw = new Draws();
+        draw.type = 1;
+        draw.drawable = myImage;
+        listDraws.add(draw);
         invalidate();
+        //removePath(); // remove extra paths
     }
 
     public void clearPath() {
         listPaths.clear();
         listStamps.clear();
+        listDraws.clear();
         invalidate();
     }
 
     public void addVT(int x, int y) {
+        removePath();
         Resources res = mContext.getResources();
         Drawable myImage = res.getDrawable(R.drawable.vt);
         myImage.setBounds(x, y, x + 100, y + 100);
-        listStamps.add(myImage);
+        //listStamps.add(myImage);
+        Draws draw = new Draws();
+        draw.type = 1;
+        draw.drawable = myImage;
+        listDraws.add(draw);
         invalidate();
+        //removePath(); // remove extra paths
+    }
+
+    public class Draws {
+        int type;
+        Drawable drawable;
+        HashMap<Integer, Brush> activePaths;
     }
 
     public class Brush {
