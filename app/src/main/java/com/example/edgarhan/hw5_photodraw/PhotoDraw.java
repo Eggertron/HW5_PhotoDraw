@@ -9,17 +9,21 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.MediaController;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 public class PhotoDraw extends AppCompatActivity {
@@ -36,6 +40,7 @@ public class PhotoDraw extends AppCompatActivity {
     private int paintColor = 0xFF660000;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +51,13 @@ public class PhotoDraw extends AppCompatActivity {
         String message = intent.getStringExtra(MainActivity.msg);
         if (message.equals("START")) {
             takePicture();
+            //dispatchTakePictureIntent();
         }
         myCanvas = (MyCanvas) findViewById(R.id.myCanvas);
         touchHandler = new TouchHandler(this);
         myCanvas.setOnTouchListener(touchHandler);
 
-        // load from file.
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(tmpImageStore, options);
-        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
+        //loadFromFile();
     }
 
     public void addNewPath(int id, float x, float y) {     myCanvas.addPath(id, x, y); }
@@ -66,10 +68,59 @@ public class PhotoDraw extends AppCompatActivity {
 
     private void takePicture() {
         Intent takePic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        takePic.putExtra(MediaStore.EXTRA_OUTPUT, tmpImageStore); // save to file.
+        //takePic.putExtra(MediaStore.EXTRA_OUTPUT, tmpImageStore); // save to file.
         if(takePic.resolveActivity(getPackageManager())!=null) {
             startActivityForResult(takePic, REQUEST_IMAGE_CAPTURE);
         }
+    }
+
+    String mCurrentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                //...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void loadFromFile() {
+        // load from file.
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(tmpImageStore, options);
+        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
     }
 
     @Override
@@ -78,6 +129,7 @@ public class PhotoDraw extends AppCompatActivity {
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
             myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
+            //loadFromFile();
         }
     }
 
@@ -172,12 +224,13 @@ public class PhotoDraw extends AppCompatActivity {
     }
 
     public void startSound() {
+        if (mp != null) mp.stop();
         mp = MediaPlayer.create(this, R.raw.pencil);
         mp.start();
     }
 
     public void stopSound() {
-        mp.stop();
+        if (mp != null) mp.stop();
         mp = null;
     }
 }
