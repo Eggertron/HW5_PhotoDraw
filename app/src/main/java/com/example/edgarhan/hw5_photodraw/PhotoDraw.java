@@ -1,10 +1,12 @@
 package com.example.edgarhan.hw5_photodraw;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,9 +14,13 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -23,8 +29,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class PhotoDraw extends AppCompatActivity {
 
@@ -41,6 +52,7 @@ public class PhotoDraw extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 1;
+    public static final int CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE = 1777;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +62,11 @@ public class PhotoDraw extends AppCompatActivity {
         Intent intent = getIntent();
         String message = intent.getStringExtra(MainActivity.msg);
         if (message.equals("START")) {
-            takePicture();
-            //dispatchTakePictureIntent();
+            captureFull();
         }
         myCanvas = (MyCanvas) findViewById(R.id.myCanvas);
         touchHandler = new TouchHandler(this);
         myCanvas.setOnTouchListener(touchHandler);
-
-        //loadFromFile();
     }
 
     public void addNewPath(int id, float x, float y) {     myCanvas.addPath(id, x, y); }
@@ -65,14 +74,6 @@ public class PhotoDraw extends AppCompatActivity {
     public void updatePath(int id, float x, float y) {     myCanvas.updatePath(id, x, y); }
 
     public void removePath(int id) {     myCanvas.removePath(); }
-
-    private void takePicture() {
-        Intent takePic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //takePic.putExtra(MediaStore.EXTRA_OUTPUT, tmpImageStore); // save to file.
-        if(takePic.resolveActivity(getPackageManager())!=null) {
-            startActivityForResult(takePic, REQUEST_IMAGE_CAPTURE);
-        }
-    }
 
     String mCurrentPhotoPath;
 
@@ -92,44 +93,37 @@ public class PhotoDraw extends AppCompatActivity {
         return image;
     }
 
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                //...
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
-        }
+    private void captureFull() {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+        startActivityForResult(intent, CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE);
     }
 
-    private void loadFromFile() {
-        // load from file.
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(tmpImageStore, options);
-        myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
+    private Bitmap rotateBitmap(Bitmap b) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(-90); // anti-clockwise by 90 degrees
+
+        // create a new bitmap from the original using the matrix to transform the result
+        Bitmap rotatedBitmap = Bitmap.createBitmap(b , 0, 0, b .getWidth(), b .getHeight(), matrix, true);
+
+        return rotatedBitmap;
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
-            myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
+            //myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
             //loadFromFile();
+        }
+        if (requestCode == CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE) {
+            File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+            Bitmap bitmap = decodeSampledBitmapFromFile(file.getAbsolutePath(), 1000, 700);
+            bitmap = rotateBitmap(bitmap);
+            myCanvas.setBackground(new BitmapDrawable(getResources(), bitmap));
         }
     }
 
@@ -233,4 +227,39 @@ public class PhotoDraw extends AppCompatActivity {
         if (mp != null) mp.stop();
         mp = null;
     }
+
+    public static Bitmap decodeSampledBitmapFromFile(String path, int reqWidth, int reqHeight)
+    { // BEST QUALITY MATCH
+
+        //First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+
+        // Calculate inSampleSize, Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        int inSampleSize = 1;
+
+        if (height > reqHeight)
+        {
+            inSampleSize = Math.round((float)height / (float)reqHeight);
+        }
+        int expectedWidth = width / inSampleSize;
+
+        if (expectedWidth > reqWidth)
+        {
+            //if(Math.round((float)width / (float)reqWidth) > inSampleSize) // If bigger SampSize..
+            inSampleSize = Math.round((float)width / (float)reqWidth);
+        }
+
+        options.inSampleSize = inSampleSize;
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFile(path, options);
+    }
+
 }
